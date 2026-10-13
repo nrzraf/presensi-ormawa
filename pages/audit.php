@@ -2,7 +2,7 @@
 /** Log audit - FR-14 */
 require_role('admin');
 $title = 'Log Audit';
-$subtitle = 'Jejak aktivitas sistem';
+$subtitle = '';
 $rows = q_all("
     SELECT a.*, m.nama AS actor FROM audit_log a
     LEFT JOIN member m ON m.id=a.actor_id

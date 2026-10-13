@@ -2,7 +2,7 @@
 /** Organisasi - profil & statistik organisasi (admin). */
 require_role('admin');
 $title = 'Organisasi';
-$subtitle = 'Profil dan ringkasan organisasi.';
+$subtitle = '';
 
 $divisi = q_all("SELECT COALESCE(NULLIF(divisi,''),'Tanpa Divisi') AS divisi, COUNT(*) AS n
     FROM member WHERE status='aktif' GROUP BY 1 ORDER BY n DESC");

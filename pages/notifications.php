@@ -2,7 +2,7 @@
 /** Notifikasi pengguna - FR-10 */
 $u = current_user();
 $title = 'Notifikasi';
-$subtitle = 'Pemberitahuan dan pengingat acara.';
+$subtitle = '';
 $rows = q_all("SELECT n.*, e.nama AS ev FROM notification n
     LEFT JOIN event e ON e.id=n.event_id
     WHERE n.member_id=? ORDER BY n.id DESC LIMIT 100", [$u['id']]);

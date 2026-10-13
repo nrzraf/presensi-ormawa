@@ -3,7 +3,7 @@
 require_role('pembina','admin');
 $u = current_user();
 $title = 'Persetujuan Proposal';
-$subtitle = 'Tinjau proposal kegiatan';
+$subtitle = '';
 
 $filter = $_GET['status'] ?? 'diajukan';
 $sql = "SELECT p.*, e.nama AS event_nama, e.jenis, e.tanggal, e.waktu, e.lokasi, e.kuota, e.status AS event_status,

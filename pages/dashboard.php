@@ -21,13 +21,12 @@ $HARI = ['Sunday'=>'Minggu','Monday'=>'Senin','Tuesday'=>'Selasa','Wednesday'=>'
 $hariIni = $HARI[date('l')] ?? '';
 
 $actions = '';
-$subtitle = 'Berikut ringkasan aktivitas organisasi hari ini.';
+$subtitle = '';
 
 /* ============================================================
    ANGGOTA
    ============================================================ */
 if ($role === 'anggota') {
-    $subtitle = 'Jelajahi dan daftarkan diri untuk acara yang tersedia.';
 
     $riwayat = q_all("
         SELECT e.id, e.nama, e.jenis, e.tanggal, e.lokasi, e.status AS ev_status,
@@ -232,9 +231,9 @@ if ($role === 'pembina') {
     } else {
         foreach ($top as $t) {
             $p = $t['total'] > 0 ? round($t['hadir'] / $t['total'] * 100) : 0;
-            $content .= '<div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0;border-bottom:1px solid var(--line)">'
-                . '<div><b>' . e($t['nama']) . '</b><div class="sub">' . e($t['divisi']) . '</div></div>'
-                . '<div style="width:44%"><div class="bar"><i style="width:' . $p . '%"></i></div><div class="sub mono" style="text-align:right">' . $p . '%</div></div></div>';
+            $content .= '<div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0;border-bottom:1px solid var(--line);flex-wrap:wrap">'
+                . '<div style="min-width:120px;flex:1 1 140px"><b>' . e($t['nama']) . '</b><div class="sub">' . e($t['divisi']) . '</div></div>'
+                . '<div style="flex:1 1 160px;max-width:240px"><div class="bar"><i style="width:' . $p . '%"></i></div><div class="sub mono" style="text-align:right">' . $p . '%</div></div></div>';
         }
     }
     $content .= '</div>';

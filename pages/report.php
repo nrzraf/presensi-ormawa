@@ -28,7 +28,7 @@ $totalReg = $hadir + $manual + $tidak;
 $pct = $totalReg > 0 ? round(($hadir + $manual) / $totalReg * 100, 1) : 0;
 
 $title = 'Laporan Kehadiran';
-$subtitle = 'Rekap kehadiran per acara';
+$subtitle = '';
 ob_start(); ?>
 <div class="card" style="margin-bottom:16px">
   <form method="get" class="inline">

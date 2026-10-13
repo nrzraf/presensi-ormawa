@@ -7,7 +7,7 @@ if ($id && !$m) { flash('error', 'Anggota tidak ditemukan.'); redirect('index.ph
 $roles = q_all("SELECT * FROM role ORDER BY id");
 
 $title = $id ? 'Ubah Anggota' : 'Tambah Anggota';
-$subtitle = 'Tambah / ubah anggota';
+$subtitle = '';
 ob_start(); ?>
 <form method="post" action="index.php?r=member_save" class="card" style="max-width:640px">
   <?= csrf_field() ?>

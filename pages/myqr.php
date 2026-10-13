@@ -16,7 +16,7 @@ if (!has_role('panitia','admin','pembina') && (int)$reg['member_id'] !== (int)$u
 $qrData = 'ORMAWA|EV' . $reg['event_id'] . '|REG' . $reg['id'] . '|' . $reg['qr_token'];
 
 $title = 'QR Presensi Saya';
-$subtitle = 'Tunjukkan QR ke panitia';
+$subtitle = '';
 ob_start(); ?>
 <div class="grid col-2e">
   <div class="card">

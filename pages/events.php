@@ -3,9 +3,7 @@
 $u = current_user();
 $isAnggota = has_role('anggota');
 $title = $isAnggota ? 'Daftar Acara' : 'Manajemen Acara';
-$subtitle = $isAnggota
-    ? 'Jelajahi dan daftarkan diri untuk acara yang tersedia.'
-    : 'Kelola seluruh acara organisasi.';
+$subtitle = '';
 $cari = trim($_GET['cari'] ?? '');
 $jenis = trim($_GET['jenis'] ?? '');
 

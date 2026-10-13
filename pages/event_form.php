@@ -7,7 +7,7 @@ $ev = $id ? q_one("SELECT * FROM event WHERE id=?", [$id]) : null;
 if ($id && !$ev) { flash('error', 'Acara tidak ditemukan.'); redirect('index.php?r=events'); }
 
 $title = $id ? 'Edit Acara' : 'Buat Acara Baru';
-$subtitle = 'Buat / ubah acara';
+$subtitle = '';
 ob_start(); ?>
 <form method="post" action="index.php?r=event_save" class="grid col-2">
   <?= csrf_field() ?>

@@ -3,7 +3,7 @@
 require_login();
 $u = current_user();
 $title = 'Pengaturan Profil';
-$subtitle = 'Perbarui data diri dan kata sandi akun Anda.';
+$subtitle = '';
 
 $err = '';
 

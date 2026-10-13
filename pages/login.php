@@ -30,21 +30,16 @@ body{font-family:Inter,system-ui,-apple-system,sans-serif;color:#2D2D2D;backgrou
 .blob.b2{width:260px;height:260px;bottom:-90px;left:-80px;opacity:.4}
 .blob.b3{width:180px;height:180px;top:38%;right:8%;opacity:.3}
 .brandside .inner{position:relative;z-index:1;display:flex;flex-direction:column;height:100%;gap:28px}
-.logo-row{display:flex;align-items:center;gap:12px}
-.logo-badge{width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);display:grid;place-items:center;flex:0 0 auto}
-.logo-badge img{width:26px;height:26px;object-fit:contain}
-.logo-row b{font-size:19px;font-weight:800;letter-spacing:.02em}
+.logo-row{display:flex;align-items:center;gap:16px}
+.logo-badge{width:60px;height:60px;border-radius:14px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);display:grid;place-items:center;flex:0 0 auto}
+.logo-badge img{width:38px;height:38px;object-fit:contain}
+.logo-row b{font-size:clamp(24px,2.7vw,34px);font-weight:800;letter-spacing:-.01em;line-height:1.15;max-width:14ch}
 .headline{margin-top:auto}
 .headline h1{font-size:clamp(26px,3.4vw,40px);font-weight:800;line-height:1.18;letter-spacing:-.02em}
-.headline p{color:rgba(255,255,255,.82);font-size:clamp(13.5px,1.5vw,15.5px);line-height:1.65;margin-top:16px;max-width:44ch}
-.feats{display:flex;flex-direction:column;gap:14px;margin-top:34px}
-.feat{display:flex;align-items:center;gap:12px;font-size:14px;font-weight:500;color:rgba(255,255,255,.94)}
-.feat .fi{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);display:grid;place-items:center;flex:0 0 auto}
 
 .formside{display:flex;align-items:center;justify-content:center;background:#fff;padding:clamp(24px,4vw,54px)}
 .formbox{width:100%;max-width:440px}
 .formbox h2{font-size:clamp(23px,2.6vw,28px);font-weight:800;letter-spacing:-.02em}
-.formbox .lead{color:#666;font-size:14px;margin-top:8px}
 
 .role-box{background:#F5F5F5;border-radius:12px;padding:14px;margin:24px 0 20px}
 .role-box .lab{font-size:10.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:#8a8a8a;margin-bottom:10px}
@@ -71,19 +66,14 @@ body{font-family:Inter,system-ui,-apple-system,sans-serif;color:#2D2D2D;backgrou
 .btn:hover{background:#4A0E17}
 
 .err{background:#FEF2F2;border:1px solid #FECACA;color:#BE123C;padding:12px 14px;border-radius:10px;font-size:13.5px;font-weight:600;margin-bottom:18px}
-.foot{text-align:center;color:#666;font-size:13px;margin-top:26px}
-.foot a{color:#580018;font-weight:700;text-decoration:none}
-.foot a:hover{text-decoration:underline}
 
 @media(max-width:900px){
   .auth{grid-template-columns:minmax(0,1fr)}
   .brandside{padding:26px 22px 30px}
   .brandside .headline{margin-top:22px}
   .headline h1{font-size:24px}
-  .headline p{font-size:13.5px}
-  .feats{flex-direction:row;flex-wrap:wrap;gap:10px;margin-top:22px}
-  .feat{font-size:12.5px}
-  .feat .fi{width:32px;height:32px}
+  .logo-badge{width:48px;height:48px}.logo-badge img{width:30px;height:30px}
+  .logo-row b{font-size:22px;max-width:20ch}
   .formside{padding:26px 20px 40px}
 }
 </style>
@@ -101,30 +91,13 @@ body{font-family:Inter,system-ui,-apple-system,sans-serif;color:#2D2D2D;backgrou
 
       <div class="headline">
         <h1>Kelola Acara Kampus<br>Lebih Efisien</h1>
-        <p>Platform terpadu untuk pengelolaan acara, registrasi, dan kehadiran organisasi mahasiswa Universitas Bakrie.</p>
-
-        <div class="feats">
-          <div class="feat">
-            <span class="fi"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2.5"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg></span>
-            Manajemen acara terpusat
-          </div>
-          <div class="feat">
-            <span class="fi"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.6"/><path d="M14 14h3v3h-3zM20 14v3M14 20h3M20 20h.01"/></svg></span>
-            Presensi QR Code real-time
-          </div>
-          <div class="feat">
-            <span class="fi"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span>
-            Laporan dan statistik lengkap
-          </div>
-        </div>
       </div>
     </div>
   </section>
 
   <section class="formside">
     <div class="formbox">
-      <h2>Selamat Datang di <?= APP_NAME ?></h2>
-      <p class="lead">Masuk untuk mengelola acara dan kehadiran organisasi.</p>
+      <h2>Masuk</h2>
 
       <div class="role-box">
         <div class="lab">Demo - Pilih Role Pengguna</div>
@@ -164,8 +137,6 @@ body{font-family:Inter,system-ui,-apple-system,sans-serif;color:#2D2D2D;backgrou
 
         <button class="btn" type="submit">Masuk</button>
       </form>
-
-      <p class="foot">Butuh akses? <a href="#" onclick="return false">Hubungi Administrator</a></p>
     </div>
   </section>
 
