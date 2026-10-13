@@ -9,7 +9,12 @@
 $u = current_user();
 $role = user_role();
 $title = 'Dashboard';
-$nama = explode(' ', trim($u['nama']))[0];
+// ambil nama panggilan (lewati gelar seperti "Dr." / "Ir.")
+$bagian = preg_split('/\s+/', trim($u['nama']));
+$nama = $bagian[0] ?? '';
+foreach ($bagian as $b) {
+    if (!preg_match('/[.]$/', $b) && mb_strlen($b) > 1) { $nama = $b; break; }
+}
 $heading = 'Halo, ' . $nama . '!';
 
 $HARI = ['Sunday'=>'Minggu','Monday'=>'Senin','Tuesday'=>'Selasa','Wednesday'=>'Rabu','Thursday'=>'Kamis','Friday'=>'Jumat','Saturday'=>'Sabtu'];
