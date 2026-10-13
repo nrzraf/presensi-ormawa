@@ -24,7 +24,7 @@ $flash = take_flash();
 body{font-family:Inter,system-ui,-apple-system,sans-serif;color:#2D2D2D;background:#fff;-webkit-font-smoothing:antialiased}
 .auth{display:grid;grid-template-columns:minmax(0,0.86fr) minmax(0,1.14fr);min-height:100vh}
 
-.brandside{position:relative;overflow:hidden;background:#580018;color:#fff;padding:clamp(28px,4vw,54px);display:flex;flex-direction:column}
+.brandside{position:relative;overflow:hidden;background:#580018;color:#fff;padding:44px;display:flex;flex-direction:column}
 .blob{position:absolute;border-radius:50%;background:#6A001C;opacity:.55;pointer-events:none}
 .blob.b1{width:420px;height:420px;top:-120px;right:-140px}
 .blob.b2{width:260px;height:260px;bottom:-90px;left:-80px;opacity:.4}
@@ -33,13 +33,13 @@ body{font-family:Inter,system-ui,-apple-system,sans-serif;color:#2D2D2D;backgrou
 .logo-row{display:flex;align-items:center;gap:16px}
 .logo-badge{width:60px;height:60px;border-radius:14px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);display:grid;place-items:center;flex:0 0 auto}
 .logo-badge img{width:38px;height:38px;object-fit:contain}
-.logo-row b{font-size:clamp(24px,2.7vw,34px);font-weight:800;letter-spacing:-.01em;line-height:1.15;max-width:14ch}
+.logo-row b{font-size:30px;font-weight:800;letter-spacing:-.01em;line-height:1.15;max-width:14ch}
 .headline{margin-top:auto}
-.headline h1{font-size:clamp(26px,3.4vw,40px);font-weight:800;line-height:1.18;letter-spacing:-.02em}
+.headline h1{font-size:36px;font-weight:800;line-height:1.18;letter-spacing:-.02em}
 
-.formside{display:flex;align-items:center;justify-content:center;background:#fff;padding:clamp(24px,4vw,54px)}
+.formside{display:flex;align-items:center;justify-content:center;background:#fff;padding:44px}
 .formbox{width:100%;max-width:440px}
-.formbox h2{font-size:clamp(23px,2.6vw,28px);font-weight:800;letter-spacing:-.02em}
+.formbox h2{font-size:26px;font-weight:800;letter-spacing:-.02em}
 
 .role-box{background:#F5F5F5;border-radius:12px;padding:14px;margin:24px 0 20px}
 .role-box .lab{font-size:10.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:#8a8a8a;margin-bottom:10px}
