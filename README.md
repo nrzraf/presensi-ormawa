@@ -3,6 +3,8 @@
 Aplikasi web pengelolaan acara & presensi QR untuk Ormawa Universitas Bakrie.
 Capstone Kelompok 7.
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/nrzraf/presensi-ormawa)
+
 ## Fitur
 
 - Login & peran (anggota, panitia, pembina, admin), rate-limit 5x/10 menit.
@@ -21,7 +23,8 @@ PHP 8.5 (runtime `vercel-php`) + PostgreSQL (Supabase). Tanpa Composer, tanpa de
 
 1. Import repo ini di Vercel.
 2. Siapkan database PostgreSQL di [Supabase](https://supabase.com) (Project Settings > Database >
-   Connection string > URI). Ganti `[YOUR-PASSWORD]` dengan kata sandi database.
+   Connection string > **Session pooler** / port `5432`). Ganti `[YOUR-PASSWORD]` dengan kata sandi
+   database. Port `5432` (session) dipakai agar prepared statement PDO berjalan normal.
 3. Tambahkan Environment Variable di Vercel:
 
    | Variable | Nilai |
