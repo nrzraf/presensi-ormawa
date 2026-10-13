@@ -1,128 +1,238 @@
 <?php
-/** Dasbor - FR-08, FR-11 */
+/**
+ * Dasbor per peran - FR-08, FR-11
+ * - Anggota : temukan acara, statistik pribadi
+ * - Panitia : ringkasan operasional acara
+ * - Pembina : ringkasan pengawasan & proposal
+ * - Admin   : ringkasan sistem menyeluruh
+ */
 $u = current_user();
-$title = 'Dasbor';
+$role = user_role();
+$title = 'Dashboard';
+$nama = explode(' ', trim($u['nama']))[0];
+$heading = 'Halo, ' . $nama . '!';
+
+$HARI = ['Sunday'=>'Minggu','Monday'=>'Senin','Tuesday'=>'Selasa','Wednesday'=>'Rabu','Thursday'=>'Kamis','Friday'=>'Jumat','Saturday'=>'Sabtu'];
+$hariIni = $HARI[date('l')] ?? '';
+
+$actions = '';
+$subtitle = 'Berikut ringkasan aktivitas organisasi hari ini.';
 
 /* ============================================================
-   TAMPILAN ANGGOTA - riwayat & persentase kehadiran PRIBADI (FR-11)
+   ANGGOTA
    ============================================================ */
-if (has_role('anggota')) {
-    $subtitle = 'Riwayat kehadiran Anda';
-    $mine = q_all("
-        SELECT e.nama, e.tanggal, e.jenis, r.status AS reg_status,
-               a.status AS att_status, a.metode, a.checkin_at
+if ($role === 'anggota') {
+    $subtitle = 'Jelajahi dan daftarkan diri untuk acara yang tersedia.';
+
+    $riwayat = q_all("
+        SELECT e.id, e.nama, e.jenis, e.tanggal, e.lokasi, e.status AS ev_status,
+               r.status AS reg_status, a.status AS att_status
         FROM registration r
         JOIN event e ON e.id=r.event_id
         LEFT JOIN attendance a ON a.registration_id=r.id
-        WHERE r.member_id=?
-        ORDER BY e.tanggal DESC", [$u['id']]);
-    $totalAcara = count($mine);
-    $hadirPribadi = 0;
-    foreach ($mine as $m) if (in_array($m['att_status'], ['hadir','cadangan'], true)) $hadirPribadi++;
-    $pctPribadi = $totalAcara > 0 ? round($hadirPribadi / $totalAcara * 100) : 0;
+        WHERE r.member_id=? ORDER BY e.tanggal DESC", [$u['id']]);
+    $diikuti = count($riwayat);
+    $hadir = 0;
+    foreach ($riwayat as $x) if (in_array($x['att_status'], ['hadir','cadangan'], true)) $hadir++;
+    $pct = $diikuti > 0 ? round($hadir / $diikuti * 100) : 0;
 
-    ob_start(); ?>
-    <div class="grid col-4" style="margin-bottom:16px">
-      <div class="kpi"><div class="lab">Acara Diikuti</div><div class="val"><?= $totalAcara ?></div><div class="delta">terdaftar</div></div>
-      <div class="kpi"><div class="lab">Kehadiran</div><div class="val"><?= $hadirPribadi ?></div><div class="delta up">hadir</div></div>
-      <div class="kpi"><div class="lab">Persentase</div><div class="val"><?= $pctPribadi ?>%</div><div class="delta">dari acara diikuti</div></div>
-      <div class="kpi"><div class="lab">Status Aktif</div><div class="val" style="font-size:19px"><?= $pctPribadi >= 75 ? 'Baik' : 'Perlu Tingkatkan' ?></div><div class="delta">syarat keaktifan</div></div>
-    </div>
-    <div class="card">
-      <div class="card-head"><h3>Riwayat Kehadiran Saya</h3></div>
-      <?php if (!$mine): ?><div class="empty">Belum ada riwayat.</div><?php else: ?>
-      <div class="table-scroll">
-      <table>
-        <thead><tr><th>Acara</th><th>Tanggal</th><th>Jenis</th><th>Status</th><th>Metode</th><th class="num">Check-in</th></tr></thead>
-        <tbody>
-        <?php foreach ($mine as $m): ?>
-          <tr>
-            <td><b><?= e($m['nama']) ?></b></td>
-            <td class="muted"><?= tgl_id($m['tanggal']) ?></td>
-            <td class="muted"><?= e($m['jenis']) ?></td>
-            <td><?= status_badge($m['att_status'] ?? 'tidak_hadir') ?></td>
-            <td><?= $m['metode'] ? '<span class="chip">'.($m['metode']==='qr'?'QR':'Manual').'</span>' : '<span class="muted">-</span>' ?></td>
-            <td class="num mono"><?= $m['checkin_at'] ? date('H:i:s', strtotime($m['checkin_at'])) : '<span class="muted">-</span>' ?></td>
-          </tr>
-        <?php endforeach; ?>
-        </tbody>
-      </table>
-      </div>
-      <?php endif; ?>
-    </div>
-    <?php $content = ob_get_clean();
+    $kategori = q_all("SELECT jenis, COUNT(*) AS n FROM event
+        WHERE status IN ('dipublikasikan','berlangsung') GROUP BY jenis ORDER BY n DESC LIMIT 8");
+    $acara = q_all("SELECT e.*,
+        (SELECT COUNT(*) FROM registration r WHERE r.event_id=e.id) AS reg,
+        (SELECT COUNT(*) FROM registration r2 WHERE r2.event_id=e.id AND r2.member_id=?) AS mine
+        FROM event e WHERE e.status IN ('dipublikasikan','berlangsung')
+        ORDER BY e.tanggal ASC LIMIT 6", [$u['id']]);
+
+    $content = '<div class="grid col-4" style="margin-bottom:18px">'
+        . stat_card('calendar','blue', $diikuti, 'Acara Diikuti', 'terdaftar', true)
+        . stat_card('check','green', $hadir, 'Kehadiran', 'hadir', true)
+        . stat_card('trend','violet', $pct . '%', 'Persentase', 'dari acara diikuti', true)
+        . stat_card('shield','rose', $pct >= 75 ? 'Baik' : 'Perlu Tingkatkan', 'Status Keaktifan', 'syarat 75%', true)
+        . '</div>';
+
+    // filter kategori + pencarian
+    $content .= '<div class="toolbar">'
+        . '<div class="search">' . icon('search') . '<input id="q" placeholder="Cari acara"></div>'
+        . '<div class="pills" id="pills"><button type="button" class="pill active" data-k="">Semua</button>';
+    foreach ($kategori as $k) {
+        $content .= '<button type="button" class="pill" data-k="' . e(strtolower($k['jenis'])) . '">' . e($k['jenis']) . '</button>';
+    }
+    $content .= '</div></div>';
+
+    // kartu acara
+    $content .= '<div class="evgrid" id="cards">';
+    if (!$acara) {
+        $content .= '<div class="card"><div class="empty">Belum ada acara tersedia.</div></div>';
+    }
+    foreach ($acara as $a) {
+        [$d, $m] = tgl_short($a['tanggal']);
+        $inisial = strtoupper(substr($a['nama'], 0, 1));
+        $penuh = $a['reg'] >= $a['kuota'];
+        $content .= '<article class="evcard" data-jenis="' . e(strtolower($a['jenis'])) . '" data-nama="' . e(strtolower($a['nama'])) . '">'
+            . '<div class="cover"><span class="big">' . e($inisial) . '</span>'
+            . '<span class="st">' . status_badge($a['status']) . '</span>'
+            . '<span class="pill">' . e($a['jenis']) . '</span></div>'
+            . '<div class="body"><h4>' . e($a['nama']) . '</h4>'
+            . '<div class="line">' . icon('calendar', 15) . $d . ' ' . ucfirst(strtolower($m)) . ' ' . date('Y', strtotime($a['tanggal'])) . ' · ' . substr($a['waktu'],0,5) . '</div>'
+            . '<div class="line">' . icon('pin', 15) . e($a['lokasi']) . '</div>'
+            . '<div class="line">' . icon('users', 15) . $a['reg'] . '/' . $a['kuota'] . ' peserta</div>'
+            . '<div class="acts">';
+        if ($a['mine']) {
+            $content .= '<a class="btn btn-ghost btn-sm" href="index.php?r=myqr&reg=' . $a['mine'] . '">' . icon('star', 15) . 'Lihat QR</a>';
+        } elseif ($penuh) {
+            $content .= '<button class="btn btn-ghost btn-sm" disabled>Kuota Penuh</button>';
+        } else {
+            $content .= '<a class="btn btn-primary btn-sm" href="index.php?r=rsvp&id=' . $a['id'] . '">Daftar Sekarang</a>';
+        }
+        $content .= '<a class="btn btn-ghost btn-sm" href="index.php?r=event&id=' . $a['id'] . '" aria-label="Detail">' . icon('eye', 15) . '</a>'
+            . '</div></div></article>';
+    }
+    $content .= '</div>';
+
+    // riwayat
+    $content .= '<div class="card" style="margin-top:18px"><div class="card-head"><h3>Riwayat Kehadiran Saya</h3><a class="link-more" href="index.php?r=events">Lihat acara</a></div>';
+    if (!$riwayat) {
+        $content .= '<div class="empty">Belum ada riwayat.</div>';
+    } else {
+        $content .= '<div class="table-scroll"><table><thead><tr><th>Acara</th><th>Tanggal</th><th>Status</th><th class="num">Kehadiran</th></tr></thead><tbody>';
+        foreach ($riwayat as $x) {
+            $content .= '<tr><td><b>' . e($x['nama']) . '</b><div class="sub">' . e($x['jenis']) . '</div></td>'
+                . '<td class="muted">' . tgl_id($x['tanggal']) . '</td>'
+                . '<td>' . status_badge($x['ev_status']) . '</td>'
+                . '<td class="num">' . status_badge($x['att_status'] ?? 'tidak_hadir') . '</td></tr>';
+        }
+        $content .= '</tbody></table></div>';
+    }
+    $content .= '</div>';
+
+    $content .= '<script>
+    (function(){
+      var pills=document.querySelectorAll("#pills .pill"), q=document.getElementById("q"),
+          cards=document.querySelectorAll("#cards .evcard"), aktif="";
+      function filter(){
+        var s=(q.value||"").toLowerCase();
+        cards.forEach(function(c){
+          var ok=(!aktif||c.dataset.jenis===aktif)&&(!s||(c.dataset.nama||"").indexOf(s)>-1);
+          c.style.display=ok?"":"none";
+        });
+      }
+      pills.forEach(function(b){ b.addEventListener("click",function(){
+        pills.forEach(function(x){x.classList.remove("active")}); b.classList.add("active");
+        aktif=b.dataset.k||""; filter();
+      });});
+      q.addEventListener("input",filter);
+    })();
+    </script>';
+
     require __DIR__ . '/../layout.php';
     return;
 }
 
-$subtitle = 'Ringkasan partisipasi';
+/* ============================================================
+   PANITIA / PEMBINA / ADMIN
+   ============================================================ */
+$whereAcara = "status IN ('dipublikasikan','berlangsung','ditutup')";
 
-$totalAcara = (int) q_val("SELECT COUNT(*) FROM event WHERE status IN ('dipublikasikan','berlangsung','ditutup')");
-$totalAnggota = (int) q_val("SELECT COUNT(*) FROM member WHERE status='aktif'");
-$hadir = (int) q_val("SELECT COUNT(*) FROM attendance");
-$terdaftar = (int) q_val("SELECT COUNT(*) FROM registration");
-$avg = $terdaftar > 0 ? round($hadir / $terdaftar * 100) : 0;
+$totalAcara   = (int) q_val("SELECT COUNT(*) FROM event WHERE $whereAcara");
+$mendatang    = (int) q_val("SELECT COUNT(*) FROM event WHERE tanggal >= CURRENT_DATE AND status IN ('dipublikasikan','berlangsung')");
+$bulanIni     = (int) q_val("SELECT COUNT(*) FROM event WHERE date_trunc('month', tanggal) = date_trunc('month', CURRENT_DATE)");
+$totalPeserta = (int) q_val("SELECT COUNT(*) FROM registration");
+$totalHadir   = (int) q_val("SELECT COUNT(*) FROM attendance");
+$avg          = $totalPeserta > 0 ? round($totalHadir / $totalPeserta * 100) : 0;
+$anggotaAktif = (int) q_val("SELECT COUNT(*) FROM member WHERE status='aktif'");
+$mggIni       = (int) q_val("SELECT COUNT(*) FROM registration WHERE registered_at >= date_trunc('week', CURRENT_DATE)");
 
-// acara terbaru + rekap
-$acara = q_all("
-    SELECT e.*,
-        (SELECT COUNT(*) FROM registration r WHERE r.event_id=e.id) AS reg,
-        (SELECT COUNT(*) FROM attendance a WHERE a.event_id=e.id) AS hadir
-    FROM event e ORDER BY e.tanggal DESC, e.waktu DESC LIMIT 5");
+// acara mendatang
+$acara = q_all("SELECT e.*,
+    (SELECT COUNT(*) FROM registration r WHERE r.event_id=e.id) AS reg,
+    (SELECT COUNT(*) FROM attendance a WHERE a.event_id=e.id) AS hadir
+    FROM event e WHERE e.status IN ('dipublikasikan','berlangsung')
+    ORDER BY e.tanggal ASC, e.waktu ASC LIMIT 5");
+
+// aktivitas terkini (audit)
+$aktivitas = q_all("SELECT a.*, m.nama FROM audit_log a LEFT JOIN member m ON m.id=a.actor_id ORDER BY a.id DESC LIMIT 6");
 
 // anggota teraktif
-$top = q_all("
-    SELECT m.nama, m.divisi,
-        COUNT(a.id) AS hadir,
-        (SELECT COUNT(*) FROM registration r2 WHERE r2.member_id=m.id) AS total
-    FROM member m
-    LEFT JOIN attendance a ON a.member_id=m.id
-    WHERE m.status='aktif'
-    GROUP BY m.id ORDER BY hadir DESC LIMIT 5");
+$top = q_all("SELECT m.nama, m.divisi, COUNT(a.id) AS hadir,
+    (SELECT COUNT(*) FROM registration r2 WHERE r2.member_id=m.id) AS total
+    FROM member m LEFT JOIN attendance a ON a.member_id=m.id
+    WHERE m.status='aktif' GROUP BY m.id ORDER BY hadir DESC LIMIT 5");
 
-ob_start(); ?>
-<div class="grid col-4" style="margin-bottom:16px">
-  <div class="kpi"><div class="lab">Total Acara</div><div class="val"><?= $totalAcara ?></div><div class="delta">aktif &amp; selesai</div></div>
-  <div class="kpi"><div class="lab">Rata-rata Kehadiran</div><div class="val"><?= $avg ?>%</div><div class="delta up">dari <?= $terdaftar ?> pendaftaran</div></div>
-  <div class="kpi"><div class="lab">Anggota Aktif</div><div class="val"><?= $totalAnggota ?></div><div class="delta">terdaftar</div></div>
-  <div class="kpi"><div class="lab">Total Presensi</div><div class="val"><?= $hadir ?></div><div class="delta">tercatat</div></div>
-</div>
+$actions = '<a class="btn btn-primary" href="index.php?r=event_form">' . icon('plus', 17) . 'Buat Acara</a>';
 
-<div class="grid col-2e">
-  <div class="card">
-    <div class="card-head"><h3>Acara Terbaru</h3></div>
-    <?php if (!$acara): ?><div class="empty">Belum ada acara.</div><?php else: ?>
-    <div class="table-scroll">
-    <table>
-      <thead><tr><th>Acara</th><th>Status</th><th>Tanggal</th><th class="num">Hadir</th><th class="num">Daftar</th><th class="num">%</th></tr></thead>
-      <tbody>
-      <?php foreach ($acara as $a): $pct = $a['reg']>0 ? round($a['hadir']/$a['reg']*100) : 0; ?>
-        <tr>
-          <td><a href="index.php?r=event&id=<?= $a['id'] ?>"><b><?= e($a['nama']) ?></b></a><div class="sub"><?= e($a['jenis']) ?></div></td>
-          <td><?= status_badge($a['status']) ?></td>
-          <td class="muted"><?= tgl_id($a['tanggal']) ?></td>
-          <td class="num mono"><?= $a['hadir'] ?></td>
-          <td class="num mono"><?= $a['reg'] ?></td>
-          <td class="num mono"><?= $pct ?>%</td>
-        </tr>
-      <?php endforeach; ?>
-      </tbody>
-    </table>
-    </div>
-    <?php endif; ?>
-  </div>
+$content = '<div class="grid col-4" style="margin-bottom:18px">'
+    . stat_card('calendar','blue', $totalAcara, 'Total Acara', '+' . $bulanIni . ' bulan ini')
+    . stat_card('clock','amber', $mendatang, 'Acara Mendatang', 'dalam 30 hari', true)
+    . stat_card('users','violet', number_format($totalPeserta, 0, ',', '.'), 'Total Peserta', '+' . $mggIni . ' minggu ini')
+    . stat_card('check','green', $totalHadir, 'Kehadiran Tercatat', $avg . '% rata-rata')
+    . '</div>';
 
-  <div class="card">
-    <div class="card-head"><h3>Anggota Teraktif</h3></div>
-    <?php if (!$top): ?><div class="empty">Belum ada data.</div><?php else: ?>
-      <?php foreach ($top as $t): $p = $t['total']>0 ? round($t['hadir']/$t['total']*100) : 0; ?>
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0;border-bottom:1px solid var(--border)">
-        <div><b><?= e($t['nama']) ?></b><div class="sub"><?= e($t['divisi']) ?></div></div>
-        <div style="width:42%"><div class="bar"><i style="width:<?= $p ?>%"></i></div><div class="sub mono" style="text-align:right"><?= $p ?>%</div></div>
-      </div>
-      <?php endforeach; ?>
-    <?php endif; ?>
-  </div>
-</div>
-<?php $content = ob_get_clean();
+$content .= '<div class="grid col-2">';
+
+// kiri: acara mendatang
+$content .= '<div class="card"><div class="card-head"><h3>Acara Mendatang</h3><a class="link-more" href="index.php?r=events">Lihat Semua ' . icon('chev', 14) . '</a></div>';
+if (!$acara) {
+    $content .= '<div class="empty">Belum ada acara.</div>';
+} else {
+    foreach ($acara as $a) {
+        [$d, $m] = tgl_short($a['tanggal']);
+        $content .= '<div class="evrow"><div class="datebox"><div class="d">' . $d . '</div><div class="m">' . $m . '</div></div>'
+            . '<div class="meta"><b>' . e($a['nama']) . '</b><div class="loc">' . icon('pin', 14) . e($a['lokasi']) . '</div></div>'
+            . '<div class="right">' . status_badge($a['status'])
+            . '<span class="muted" style="font-size:12.5px;white-space:nowrap">' . $a['reg'] . ' peserta</span></div></div>';
+    }
+}
+$content .= '</div>';
+
+// kanan: aktivitas
+$content .= '<div class="card"><div class="card-head"><h3>Aktivitas Terkini</h3></div>';
+if (!$aktivitas) {
+    $content .= '<div class="empty">Belum ada aktivitas.</div>';
+} else {
+    $ikonMap = ['login'=>'user','logout'=>'exit','presensi'=>'check','buat'=>'plus','ubah'=>'edit','hapus'=>'alert','proposal'=>'file','publikasi'=>'calendar'];
+    foreach ($aktivitas as $v) {
+        $key = 'calendar'; $col = 'blue';
+        foreach ($ikonMap as $k => $ic) { if (stripos($v['aksi'], $k) !== false) { $key = $ic; break; } }
+        $colMap = ['user'=>'rose','exit'=>'gray','check'=>'green','plus'=>'violet','edit'=>'amber','alert'=>'rose','file'=>'blue','calendar'=>'blue'];
+        $col = $colMap[$key] ?? 'blue';
+        $txt = $v['detail'] ?: ucfirst($v['aksi'] . ' ' . $v['entitas']);
+        $content .= '<div class="act"><span class="aic sic ' . $col . '" style="width:34px;height:34px;border-radius:50%">' . icon($key, 16) . '</span>'
+            . '<div class="txt"><div>' . e($txt) . '</div><div class="time">' . waktu_lalu($v['created_at']) . '</div></div></div>';
+    }
+}
+$content .= '</div></div>';
+
+// bawah: peserta teraktif (panitia/admin) atau proposal (pembina)
+if ($role === 'pembina') {
+    $prop = q_all("SELECT p.*, e.nama AS ev, m.nama AS pengaju FROM proposal p
+        JOIN event e ON e.id=p.event_id LEFT JOIN member m ON m.id=p.diajukan_oleh
+        ORDER BY p.id DESC LIMIT 5");
+    $content .= '<div class="card" style="margin-top:16px"><div class="card-head"><h3>Proposal Terbaru</h3><a class="link-more" href="index.php?r=proposals">Tinjau ' . icon('chev', 14) . '</a></div>';
+    if (!$prop) {
+        $content .= '<div class="empty">Belum ada proposal.</div>';
+    } else {
+        $content .= '<div class="table-scroll"><table><thead><tr><th>Proposal</th><th>Acara</th><th>Pengaju</th><th>Status</th></tr></thead><tbody>';
+        foreach ($prop as $p) {
+            $content .= '<tr><td><b>' . e($p['judul'] ?: 'Proposal') . '</b></td><td class="muted">' . e($p['ev']) . '</td>'
+                . '<td class="muted">' . e($p['pengaju'] ?? '-') . '</td><td>' . status_badge($p['status']) . '</td></tr>';
+        }
+        $content .= '</tbody></table></div>';
+    }
+    $content .= '</div>';
+} else {
+    $content .= '<div class="card" style="margin-top:16px"><div class="card-head"><h3>Peserta Teraktif</h3><a class="link-more" href="index.php?r=members">Kelola ' . icon('chev', 14) . '</a></div>';
+    if (!$top) {
+        $content .= '<div class="empty">Belum ada data.</div>';
+    } else {
+        foreach ($top as $t) {
+            $p = $t['total'] > 0 ? round($t['hadir'] / $t['total'] * 100) : 0;
+            $content .= '<div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0;border-bottom:1px solid var(--line)">'
+                . '<div><b>' . e($t['nama']) . '</b><div class="sub">' . e($t['divisi']) . '</div></div>'
+                . '<div style="width:44%"><div class="bar"><i style="width:' . $p . '%"></i></div><div class="sub mono" style="text-align:right">' . $p . '%</div></div></div>';
+        }
+    }
+    $content .= '</div>';
+}
+
 require __DIR__ . '/../layout.php';

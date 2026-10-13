@@ -40,6 +40,8 @@ switch ($r) {
     case 'audit':        require __DIR__ . '/pages/audit.php';        break;
 
     case 'notifications': require __DIR__ . '/pages/notifications.php'; break;
+    case 'profile':       require __DIR__ . '/pages/profile.php';       break;
+    case 'organisasi':    require __DIR__ . '/pages/organisasi.php';    break;
 
     case 'proposal_form':   require __DIR__ . '/pages/proposal_form.php';   break;
     case 'proposal_save':   require __DIR__ . '/pages/proposal_save.php';   break;

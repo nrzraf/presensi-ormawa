@@ -115,15 +115,19 @@ function tgl_id(string $date): string {
 
 function status_badge(string $status): string {
     $map = [
-        'hadir'          => ['b-present', ' Hadir'],
-        'cadangan'       => ['b-fallback', '! Cadangan'],
-        'tidak_hadir'    => ['b-absent', ' Tidak Hadir'],
+        'hadir'          => ['b-present', 'Hadir'],
+        'cadangan'       => ['b-fallback', 'Cadangan'],
+        'tidak_hadir'    => ['b-absent', 'Tidak Hadir'],
         'terdaftar'      => ['b-muted', 'Terdaftar'],
         'draft'          => ['b-muted', 'Draft'],
-        'dipublikasikan' => ['b-info', 'Dipublikasikan'],
-        'berlangsung'    => ['b-present', 'Berlangsung'],
+        'dipublikasikan' => ['b-info', 'Akan Datang'],
+        'berlangsung'    => ['b-fallback', 'Berlangsung'],
         'ditutup'        => ['b-muted', 'Ditutup'],
         'dibatalkan'     => ['b-absent', 'Dibatalkan'],
+        'diajukan'       => ['b-info', 'Diajukan'],
+        'disetujui'      => ['b-present', 'Disetujui'],
+        'ditolak'        => ['b-absent', 'Ditolak'],
+        'revisi'         => ['b-warn', 'Revisi'],
     ];
     [$cls, $label] = $map[$status] ?? ['b-muted', ucfirst($status)];
     return '<span class="badge ' . $cls . '">' . $label . '</span>';
@@ -132,4 +136,65 @@ function status_badge(string $status): string {
 /** URL file QR (menggunakan layanan QR berbasis teks, tanpa dependency). */
 function qr_img_url(string $data, int $size = 220): string {
     return 'https://api.qrserver.com/v1/create-qr-code/?size=' . $size . 'x' . $size . '&data=' . urlencode($data);
+}
+
+/* ---------------- Ikon & komponen tampilan ---------------- */
+
+/** Ikon garis (stroke) tanpa dependency eksternal. */
+function icon(string $name, int $s = 18): string {
+    static $paths = [
+        'grid'     => '<rect x="3" y="3" width="7.5" height="7.5" rx="1.8"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.8"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.8"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.8"/>',
+        'calendar' => '<rect x="3" y="4.5" width="18" height="16.5" rx="2.5"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/>',
+        'clip'     => '<rect x="4" y="3.5" width="16" height="17" rx="2.5"/><path d="M9 3.5h6M8.5 10l2 2 4-4M8.5 16h7"/>',
+        'users'    => '<circle cx="9" cy="8" r="3.2"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0M16 5.2a3 3 0 0 1 0 5.6M17 20a5.5 5.5 0 0 0-2-4.2"/>',
+        'chart'    => '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+        'building' => '<path d="M4 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16M14 21V9h4a2 2 0 0 1 2 2v10M2 21h20M7 7h2M7 11h2M7 15h2"/>',
+        'shield'   => '<path d="M12 3l7 3v5.5c0 4.3-2.9 7.6-7 8.5-4.1-.9-7-4.2-7-8.5V6z"/><circle cx="12" cy="10.5" r="2.2"/>',
+        'gear'     => '<circle cx="12" cy="12" r="3.1"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 7 19.4l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.7 1.7 0 0 0 3 13.6H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 7l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 2.9-1.2V3a2 2 0 1 1 4 0v.1A1.7 1.7 0 0 0 17 4.6l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0 1.2 2.9H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1.1z"/>',
+        'bell'     => '<path d="M18 8a6 6 0 1 0-12 0c0 7-3 8-3 8h18s-3-1-3-8"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>',
+        'exit'     => '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>',
+        'plus'     => '<path d="M12 5v14M5 12h14"/>',
+        'pin'      => '<path d="M20 10.5c0 6-8 11.5-8 11.5S4 16.5 4 10.5a8 8 0 0 1 16 0z"/><circle cx="12" cy="10.5" r="2.6"/>',
+        'star'     => '<path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',
+        'search'   => '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/>',
+        'clock'    => '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+        'check'    => '<path d="M20 6.5 9.5 17 4 11.5"/>',
+        'file'     => '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/>',
+        'trend'    => '<path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/>',
+        'eye'      => '<path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.6"/>',
+        'user'     => '<circle cx="12" cy="8" r="3.6"/><path d="M5 20a7 7 0 0 1 14 0"/>',
+        'alert'    => '<path d="M12 3.5 2.5 20h19z"/><path d="M12 10v4M12 17h.01"/>',
+        'chev'     => '<path d="m6 9 6 6 6-6"/>',
+        'edit'     => '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+        'lock'     => '<rect x="4" y="10.5" width="16" height="10.5" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/>',
+        'mail'     => '<rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><path d="m3 6.5 9 6 9-6"/>',
+    ];
+    $p = $paths[$name] ?? '';
+    return '<svg class="i" width="' . $s . '" height="' . $s . '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . $p . '</svg>';
+}
+
+/** Kartu statistik (ikon + tren + nilai + label). */
+function stat_card(string $ic, string $color, $val, string $lab, string $trend = '', bool $trendMute = false): string {
+    $t = $trend !== ''
+        ? '<span class="trend' . ($trendMute ? ' mute' : '') . '">' . ($trendMute ? '' : icon('trend', 13)) . $trend . '</span>'
+        : '';
+    return '<div class="stat"><div class="top"><span class="sic ' . $color . '">' . icon($ic, 20) . '</span>' . $t . '</div>'
+         . '<div class="val">' . $val . '</div><div class="lab">' . e($lab) . '</div></div>';
+}
+
+/** "2 jam lalu" dari timestamp. */
+function waktu_lalu(string $ts): string {
+    $d = time() - strtotime($ts);
+    if ($d < 60) return 'baru saja';
+    if ($d < 3600) return floor($d / 60) . ' menit lalu';
+    if ($d < 86400) return floor($d / 3600) . ' jam lalu';
+    if ($d < 604800) return floor($d / 86400) . ' hari lalu';
+    return date('d/m/Y', strtotime($ts));
+}
+
+/** Tanggal pendek: 20 Okt */
+function tgl_short(string $date): array {
+    $bln = [1=>'Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+    $t = strtotime($date);
+    return [date('j', $t), strtoupper($bln[(int)date('n', $t)])];
 }
