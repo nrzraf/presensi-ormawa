@@ -15,15 +15,16 @@ function nav_item(string $href, string $icon, string $label, string $active, str
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0F766E">
+<meta name="theme-color" content="#580018">
 <title><?= e($title ?? APP_NAME) ?> - <?= APP_NAME ?></title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --primary:#0F172A;--secondary:#64748B;--tertiary:#0F766E;--neutral:#F8FAFC;--surface:#FFFFFF;
-  --border:#E2E8F0;--success:#047857;--warning:#B45309;--danger:#BE123C;--info:#0369A1;--tint:#F1F5F9;
-  --r-sm:6px;--r-md:10px;--r-lg:16px;--r-pill:999px;--sh2:0 8px 24px rgba(15,23,42,.16);
+  --brand:#580018;--brand-dark:#4A0E17;--brand-soft:#7E001F;
+  --primary:#2D2D2D;--secondary:#666666;--tertiary:#580018;--neutral:#F6FAFB;--surface:#FFFFFF;
+  --border:#E6E9ED;--success:#047857;--warning:#B45309;--danger:#BE123C;--info:#0369A1;--tint:#F6FAFB;
+  --r-sm:8px;--r-md:10px;--r-lg:16px;--r-pill:999px;--sh2:0 8px 24px rgba(88,0,24,.18);
   --sidebar:250px;
 }
 *{margin:0;padding:0;box-sizing:border-box}
@@ -47,7 +48,7 @@ img{max-width:100%;height:auto}
 .nav-a:hover{background:var(--tint);color:var(--primary)}
 .nav-a.active{background:var(--tertiary);color:#fff}
 .nav-a .ic{width:20px;text-align:center;font-size:15px;flex:0 0 auto}
-.nav-sec{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#94a3b8;padding:12px 12px 5px}
+.nav-sec{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#9a8a8e;padding:12px 12px 5px}
 
 .appbar{display:none}
 .menu-btn{width:44px;height:44px;border-radius:var(--r-md);display:grid;place-items:center;background:var(--surface);border:1px solid var(--border)}
@@ -72,7 +73,7 @@ img{max-width:100%;height:auto}
 
 .topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:20px;flex-wrap:wrap}
 .userchip{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-pill);padding:6px 14px 6px 6px;max-width:100%}
-.avatar{width:30px;height:30px;border-radius:50%;background:var(--primary);color:#fff;display:grid;place-items:center;font-size:13px;font-weight:700;flex:0 0 auto}
+.avatar{width:30px;height:30px;border-radius:50%;background:var(--brand);color:#fff;display:grid;place-items:center;font-size:13px;font-weight:700;flex:0 0 auto}
 .userchip b{font-size:13px}.userchip small{display:block;color:var(--secondary);font-size:11px;line-height:1.1}
 .userchip .txt{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .page-title{font-size:clamp(19px,2.6vw,24px);font-weight:800;letter-spacing:-.02em}
@@ -95,7 +96,7 @@ h3{font-size:clamp(14.5px,1.9vw,16px);font-weight:700}
 .up{color:var(--success)}.down{color:var(--danger)}
 
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-size:13.5px;font-weight:600;padding:0 16px;min-height:44px;border-radius:var(--r-md);transition:.15s;white-space:nowrap}
-.btn-primary{background:var(--tertiary);color:#fff}.btn-primary:hover{background:var(--primary)}
+.btn-primary{background:var(--brand);color:#fff}.btn-primary:hover{background:var(--brand-dark)}
 .btn-ghost{background:var(--surface);color:var(--primary);border:1px solid var(--border)}.btn-ghost:hover{background:var(--tint)}
 .btn-danger{background:var(--danger);color:#fff}.btn-danger:hover{filter:brightness(.92)}
 .btn-sm{min-height:38px;padding:0 13px;font-size:12.5px}
@@ -118,7 +119,7 @@ th.num,td.num{text-align:right}
 
 label{display:block;font-size:12px;font-weight:700;margin-bottom:6px}
 input,select,textarea{width:100%;font-family:inherit;font-size:16px;color:var(--primary);background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:11px 12px;outline:none;transition:.15s}
-input:focus,select:focus,textarea:focus{border-color:var(--tertiary);box-shadow:0 0 0 3px rgba(15,118,110,.15)}
+input:focus,select:focus,textarea:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(88,0,24,.15)}
 .field{margin-bottom:14px}
 .hint{font-size:12px;color:var(--secondary);margin-top:5px}
 

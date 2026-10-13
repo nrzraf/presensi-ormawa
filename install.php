@@ -231,12 +231,12 @@ if (isset($_POST['do_install'])) {
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Inter,system-ui,sans-serif;background:#F8FAFC;color:#0F172A;display:grid;place-items:center;min-height:100vh;padding:24px}
+body{font-family:Inter,system-ui,sans-serif;background:#F6FAFB;color:#2D2D2D;display:grid;place-items:center;min-height:100vh;padding:24px}
 .card{background:#fff;border:1px solid #E2E8F0;border-radius:16px;padding:32px;max-width:560px;width:100%;box-shadow:0 8px 24px rgba(15,23,42,.06)}
 h1{font-size:22px;font-weight:800;letter-spacing:-.02em;margin-bottom:6px}
 p.sub{color:#64748B;font-size:14px;margin-bottom:22px}
-.btn{display:inline-flex;align-items:center;justify-content:center;width:100%;height:46px;border:none;border-radius:10px;background:#0F766E;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit}
-.btn:hover{background:#0F172A}
+.btn{display:inline-flex;align-items:center;justify-content:center;width:100%;height:46px;border:none;border-radius:10px;background:#580018;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit}
+.btn:hover{background:#4A0E17}
 ul{list-style:none;margin:18px 0}
 li{padding:9px 0;font-size:14px;border-bottom:1px solid #F1F5F9}
 .msg{background:#ECFDF5;border:1px solid #A7F3D0;border-radius:10px;padding:14px 16px;margin-bottom:18px}
@@ -245,7 +245,7 @@ table{width:100%;border-collapse:collapse;margin-top:8px;font-size:13.5px}
 td{padding:8px;border-bottom:1px solid #F1F5F9}
 td:first-child{color:#64748B;width:44%}
 code{background:#F1F5F9;padding:2px 6px;border-radius:5px;font-size:13px}
-a.go{display:inline-block;margin-top:16px;background:#0F172A;color:#fff;text-decoration:none;padding:12px 20px;border-radius:10px;font-weight:600}
+a.go{display:inline-block;margin-top:16px;background:#580018;color:#fff;text-decoration:none;padding:12px 20px;border-radius:10px;font-weight:600}
 </style>
 </head>
 <body>
