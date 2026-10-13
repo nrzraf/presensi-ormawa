@@ -2,7 +2,8 @@
 /**
  * Front controller untuk Vercel (runtime vercel-php).
  * - Menyajikan berkas statis (logo, css, js) langsung.
- * - Sisanya diteruskan ke router aplikasi (index.php?r=...).
+ * - Menentukan route dari query (?r=...) atau dari path (mis. /install.php).
+ * - Meneruskan ke router aplikasi (index.php).
  */
 $root = dirname(__DIR__);
 $uri  = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
@@ -27,9 +28,17 @@ if ($uri !== '/' && in_array($ext, $static, true)) {
     }
 }
 
-// --- aplikasi ---
+// --- route dari query (?r=...) ---
 if (!isset($_GET['r']) || $_GET['r'] === '') {
-    $_GET['r'] = 'dashboard';
+    // fallback: tentukan dari path (mis. /install.php, /cron_reminder.php)
+    if (preg_match('#/install\.php$#', $uri)) {
+        $_GET['r'] = 'install';
+    } elseif (preg_match('#/cron_reminder\.php$#', $uri)) {
+        $_GET['r'] = 'cron';
+    } else {
+        $_GET['r'] = 'dashboard';
+    }
 }
+
 chdir($root);
 require $root . '/index.php';
