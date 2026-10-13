@@ -8,27 +8,48 @@
  */
 
 // ---- Database ----
-// Prioritas: DATABASE_URL (Supabase) -> PGHOST/PGPORT/... -> default lokal.
-$__db = [];
-$__url = getenv('DATABASE_URL');
-if ($__url) {
-    $p = parse_url($__url);
+// Prioritas: DATABASE_URL -> POSTGRES_URL (Supabase via Vercel Marketplace)
+// -> DB_HOST/DB_PORT/... -> default lokal.
+$__env = static fn(string $k): string => (string)(getenv($k) ?: '');
+
+$__db = null;
+foreach (['DATABASE_URL', 'POSTGRES_URL_NON_POOLING', 'POSTGRES_URL', 'POSTGRES_PRISMA_URL'] as $__key) {
+    $__url = $__env($__key);
+    if ($__url !== '' && str_starts_with($__url, 'postgres')) {
+        $p = parse_url($__url);
+        if (!empty($p['host'])) {
+            $__db = [
+                'host' => $p['host'],
+                'port' => (string)($p['port'] ?? 5432),
+                'name' => ltrim($p['path'] ?? '', '/') ?: 'postgres',
+                'user' => urldecode($p['user'] ?? ''),
+                'pass' => urldecode($p['pass'] ?? ''),
+                'sslmode' => 'require',
+            ];
+            break;
+        }
+    }
+}
+
+if ($__db === null && $__env('POSTGRES_HOST') !== '') {
     $__db = [
-        'host' => $p['host'] ?? 'localhost',
-        'port' => (string)($p['port'] ?? 5432),
-        'name' => ltrim($p['path'] ?? '', '/'),
-        'user' => urldecode($p['user'] ?? ''),
-        'pass' => urldecode($p['pass'] ?? ''),
+        'host' => $__env('POSTGRES_HOST'),
+        'port' => $__env('POSTGRES_PORT') ?: '5432',
+        'name' => $__env('POSTGRES_DATABASE') ?: 'postgres',
+        'user' => $__env('POSTGRES_USER') ?: 'postgres',
+        'pass' => $__env('POSTGRES_PASSWORD'),
         'sslmode' => 'require',
     ];
-} else {
+}
+
+if ($__db === null) {
     $__db = [
-        'host' => getenv('DB_HOST') ?: '127.0.0.1',
-        'port' => getenv('DB_PORT') ?: '5432',
-        'name' => getenv('DB_NAME') ?: 'postgres',
-        'user' => getenv('DB_USER') ?: 'postgres',
-        'pass' => getenv('DB_PASS') ?: '',
-        'sslmode' => getenv('DB_SSLMODE') ?: 'prefer',
+        'host' => $__env('DB_HOST') ?: '127.0.0.1',
+        'port' => $__env('DB_PORT') ?: '5432',
+        'name' => $__env('DB_NAME') ?: 'postgres',
+        'user' => $__env('DB_USER') ?: 'postgres',
+        'pass' => $__env('DB_PASS'),
+        'sslmode' => $__env('DB_SSLMODE') ?: 'prefer',
     ];
 }
 
