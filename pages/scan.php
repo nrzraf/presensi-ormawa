@@ -215,6 +215,11 @@ function fitBox(){
   });
 
   window.addEventListener('resize', function(){ if (!resizing) fitBox(); });
+
+  // posisikan di tengah sejak awal, walau kamera belum/tidak aktif
+  fitBox();
+  setTimeout(fitBox, 300);
+  setTimeout(fitBox, 900);
 })();
 
 async function startCam(){
