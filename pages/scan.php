@@ -3,7 +3,7 @@
  * Scan Presensi Peserta - FR-05, FR-06.
  * Peserta memindai QR sesi acara yang ditampilkan panitia.
  */
-require_login();
+require_role('anggota');
 $u = current_user();
 
 $eventId = (int)($_GET['event'] ?? 0);

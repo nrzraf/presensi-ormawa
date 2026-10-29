@@ -4,7 +4,7 @@
  * Peserta mengirim token sesi acara (dari QR yang ditampilkan panitia).
  * Balas JSON.
  */
-require_login();
+require_role('anggota');
 header('Content-Type: application/json');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') { echo json_encode(['ok'=>false,'pesan'=>'Metode tidak diizinkan']); exit; }

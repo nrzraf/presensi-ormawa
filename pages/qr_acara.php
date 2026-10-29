@@ -46,7 +46,6 @@ ob_start(); ?>
         <?php endforeach; ?>
       </select>
     </div>
-    <a class="btn btn-ghost" href="index.php?r=scan&event=<?= $eventId ?>">Mode kamera</a>
   </form>
 </div>
 
