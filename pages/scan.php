@@ -73,7 +73,7 @@ ob_start(); ?>
 <script>
 const CSRF = <?= json_encode(csrf_token()) ?>;
 const API = 'index.php?r=scan_api';
-let busy = false, lastCode = '', lastTime = 0;
+let busy = false, lastCode = '', lastTime = 0, qr = null, stopped = false;
 
 function beep(ok){
   try{
@@ -85,6 +85,22 @@ function beep(ok){
     g.gain.exponentialRampToValueAtTime(.001, ctx.currentTime+.18);
     o.start(); o.stop(ctx.currentTime+.2);
   }catch(e){}
+}
+
+function setStatus(t, ok){
+  const s = document.getElementById('camStatus');
+  if (s) { s.textContent = t; s.className = 'badge ' + (ok === false ? 'b-absent' : 'b-present'); }
+}
+
+// matikan kamera + lepas izin track
+async function stopCam(){
+  if (stopped) return; stopped = true;
+  try { if (qr) { await qr.stop(); await qr.clear(); } } catch(e){}
+  document.querySelectorAll('#reader video').forEach(v => {
+    const st = v.srcObject; if (st) st.getTracks().forEach(t => t.stop());
+    v.srcObject = null; v.remove();
+  });
+  const r = document.getElementById('reader'); if (r) r.innerHTML = '';
 }
 
 async function send(code){
@@ -110,25 +126,58 @@ function showResult(d){
     <div style="font-weight:700;font-size:15px">${d.ok ? 'Presensi tercatat' : 'Gagal'}</div>
     <div style="font-size:13px;color:#e2e8f0;margin-top:3px">${d.pesan || ''}</div>
   </div>`;
-  if (d.ok) setTimeout(()=>location.reload(), 1200);
+  if (d.ok) setTimeout(()=>location.reload(), 1400);
 }
 
 function submitManual(){
   const c = document.getElementById('manualCode').value.trim().toUpperCase();
   if (!c) { alert('Masukkan kode sesi.'); return; }
+  stopCam();
   send(c);
   document.getElementById('manualCode').value='';
 }
 
-const scanner = new Html5QrcodeScanner('reader', { fps:10, qrbox:{width:230,height:230}, rememberLastUsedCamera:true }, false);
-function onScan(decoded){
+async function onScan(decoded){
   const now = Date.now();
   if (decoded === lastCode && now - lastTime < 3000) return;
   lastCode = decoded; lastTime = now;
+  setStatus('Terbaca', true);
+  await stopCam();          // kamera langsung ditutup
   send(decoded);
 }
-scanner.render(onScan, ()=>{});
-setTimeout(()=>{ const s=document.getElementById('camStatus'); if(s) s.textContent='Kamera aktif'; }, 1500);
+
+async function startCam(){
+  qr = new Html5Qrcode('reader', { verbose:false });
+  try{
+    await qr.start(
+      { facingMode: 'environment' },
+      { fps: 10, qrbox: { width: 230, height: 230 } },
+      onScan,
+      () => {}
+    );
+    setStatus('Kamera aktif', true);
+  }catch(e){
+    const msg = String(e && e.message || e);
+    if (/NotAllowed|Permission/i.test(msg)) {
+      setStatus('Izin kamera ditolak', false);
+      showResult({ok:false, pesan:'Izinkan akses kamera di browser, atau ketik kode sesi di bawah.'});
+    } else if (/NotFound|no camera|Overconstrained/i.test(msg)) {
+      setStatus('Kamera tidak ada', false);
+      showResult({ok:false, pesan:'Kamera tidak ditemukan. Gunakan kode sesi di bawah.'});
+    } else {
+      setStatus('Kamera gagal', false);
+      showResult({ok:false, pesan:'Kamera tidak bisa dibuka. Gunakan kode sesi di bawah.'});
+    }
+  }
+}
+
+// auto-mulai saat halaman dibuka
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', startCam);
+} else {
+  startCam();
+}
+window.addEventListener('pagehide', stopCam);
 </script>
 <?php $content = ob_get_clean();
 require __DIR__ . '/../layout.php';
