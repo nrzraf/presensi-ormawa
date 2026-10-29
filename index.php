@@ -30,6 +30,7 @@ switch ($r) {
 
     case 'scan':        require __DIR__ . '/pages/scan.php';        break;
     case 'scan_api':    require __DIR__ . '/pages/scan_api.php';    break;
+    case 'qr_acara':    require __DIR__ . '/pages/qr_acara.php';    break;
 
     case 'report':    require __DIR__ . '/pages/report.php';    break;
     case 'export':    require __DIR__ . '/pages/export.php';    break;

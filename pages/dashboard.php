@@ -83,7 +83,7 @@ if ($role === 'anggota') {
             . '<div class="line">' . icon('users', 15) . $a['reg'] . '/' . $a['kuota'] . ' peserta</div>'
             . '<div class="acts">';
         if ($a['mine']) {
-            $content .= '<a class="btn btn-ghost btn-sm" href="index.php?r=myqr&reg=' . $a['mine'] . '">' . icon('star', 15) . 'Lihat QR</a>';
+            $content .= '<a class="btn btn-ghost btn-sm" href="index.php?r=scan&event=' . $a['id'] . '">' . icon('star', 15) . 'Scan Presensi</a>';
         } elseif ($penuh) {
             $content .= '<button class="btn btn-ghost btn-sm" disabled>Kuota Penuh</button>';
         } else {

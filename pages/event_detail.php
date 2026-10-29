@@ -63,7 +63,7 @@ ob_start(); ?>
     </div>
     <?php if (has_role('panitia','admin')): ?>
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
-      <a class="btn btn-primary btn-sm" href="index.php?r=scan&event=<?= $id ?>">Scan Presensi</a>
+      <a class="btn btn-primary btn-sm" href="index.php?r=qr_acara&event=<?= $id ?>">QR Presensi Acara</a>
       <a class="btn btn-ghost btn-sm" href="index.php?r=proposal_form&event=<?= $id ?>">Ajukan Proposal</a>
       <a class="btn btn-ghost btn-sm" href="index.php?r=event_form&id=<?= $id ?>">Edit Acara</a>
       <a class="btn btn-ghost btn-sm" href="index.php?r=export&id=<?= $id ?>">Unduh Rekap</a>
@@ -134,7 +134,7 @@ ob_start(); ?>
       <tr><td class="muted">Check-in</td><td class="mono"><?= $myreg['checkin_at'] ? date('d/m/Y H:i:s', strtotime($myreg['checkin_at'])) : '-' ?></td></tr>
     </table>
     </div>
-    <a class="btn btn-primary btn-sm" style="margin-top:14px" href="index.php?r=myqr&reg=<?= $myreg['id'] ?>">Lihat QR Presensi</a>
+    <a class="btn btn-primary btn-sm" style="margin-top:14px" href="index.php?r=scan&event=<?= $id ?>">Scan Presensi</a>
   <?php else: ?>
     <div class="empty">Anda belum terdaftar. <a href="index.php?r=events">Daftar</a>.</div>
   <?php endif; ?>

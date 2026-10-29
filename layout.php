@@ -301,12 +301,13 @@ input:focus,select:focus,textarea:focus{border-color:var(--brand);box-shadow:0 0
 
       <?php if (has_role('anggota')): ?>
         <?php nav_item('index.php?r=events', 'star', 'Daftar Acara', $r, 'events'); ?>
+        <?php nav_item('index.php?r=scan', 'clip', 'Scan Presensi', $r, 'scan'); ?>
         <?php nav_item('index.php?r=notifications', 'bell', 'Notifikasi', $r, 'notifications'); ?>
         <?php nav_item('index.php?r=profile', 'gear', 'Pengaturan Profil', $r, 'profile'); ?>
       <?php else: ?>
         <?php nav_item('index.php?r=events', 'calendar', 'Manajemen Acara', $r, 'events'); ?>
         <?php if (has_role('panitia','admin')): ?>
-          <?php nav_item('index.php?r=scan', 'clip', 'Kelola Kehadiran', $r, 'scan'); ?>
+          <?php nav_item('index.php?r=qr_acara', 'clip', 'QR Presensi', $r, 'qr_acara'); ?>
         <?php endif; ?>
         <?php if (has_role('pembina','admin')): ?>
           <?php nav_item('index.php?r=proposals', 'file', 'Proposal', $r, 'proposals'); ?>

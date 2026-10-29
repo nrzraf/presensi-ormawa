@@ -62,6 +62,7 @@ if (isset($_POST['do_install'])) {
                 dibuat_oleh INT REFERENCES member(id) ON DELETE SET NULL,
                 h1_sent_at TIMESTAMP,
                 perubahan_dikirim_at TIMESTAMP,
+                qr_token VARCHAR(64) UNIQUE,
                 created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
             )",
 

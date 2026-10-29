@@ -59,7 +59,7 @@ ob_start(); ?>
           <div class="line"><?= icon('users', 15) ?><?= $a['reg'] ?>/<?= $a['kuota'] ?> peserta</div>
           <div class="acts">
             <?php if ($a['my_reg']): ?>
-              <a class="btn btn-ghost btn-sm" href="index.php?r=myqr&reg=<?= $a['my_reg'] ?>"><?= icon('star', 15) ?>Lihat QR</a>
+              <a class="btn btn-ghost btn-sm" href="index.php?r=scan&event=<?= $a['id'] ?>"><?= icon('star', 15) ?>Scan Presensi</a>
             <?php elseif ($penuh): ?>
               <button class="btn btn-ghost btn-sm" disabled>Kuota Penuh</button>
             <?php else: ?>
@@ -89,7 +89,7 @@ ob_start(); ?>
             <td class="num mono"><?= $a['hadir'] ?></td>
             <td class="num">
               <?php if (has_role('panitia','admin')): ?>
-                <a class="btn btn-ghost btn-sm" href="index.php?r=scan&event=<?= $a['id'] ?>">Presensi</a>
+                <a class="btn btn-ghost btn-sm" href="index.php?r=qr_acara&event=<?= $a['id'] ?>">QR Acara</a>
               <?php endif; ?>
               <a class="btn btn-ghost btn-sm" href="index.php?r=event&id=<?= $a['id'] ?>">Detail</a>
             </td>

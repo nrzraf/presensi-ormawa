@@ -8,7 +8,7 @@ if (!in_array($ev['status'], ['dipublikasikan','berlangsung'], true)) { flash('e
 
 // sudah terdaftar?  tampilkan QR yang ada (anti-duplikasi A2)
 $reg = q_one("SELECT * FROM registration WHERE event_id=? AND member_id=?", [$id, $u['id']]);
-if ($reg) { redirect('index.php?r=myqr&reg=' . $reg['id']); }
+if ($reg) { redirect('index.php?r=scan&event=' . $id); }
 
 $regCount = (int) q_val("SELECT COUNT(*) FROM registration WHERE event_id=?", [$id]);
 if ($regCount >= $ev['kuota']) { flash('error', 'Kuota acara sudah penuh.'); redirect('index.php?r=events'); }
@@ -23,5 +23,5 @@ audit('rsvp', 'registration', $rid, 'Mendaftar acara: ' . $ev['nama']);
 // notifikasi konfirmasi (FR-10)
 q("INSERT INTO notification (member_id, event_id, tipe, isi) VALUES (?,?, 'konfirmasi', ?)",
   [$u['id'], $id, 'Pendaftaran berhasil: ' . $ev['nama']]);
-flash('ok', 'Pendaftaran berhasil! QR presensi Anda sudah dibuat.');
-redirect('index.php?r=myqr&reg=' . $rid);
+flash('ok', 'Pendaftaran berhasil. Scan QR acara saat hari-H untuk presensi.');
+redirect('index.php?r=scan&event=' . $id);
