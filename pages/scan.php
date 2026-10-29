@@ -160,12 +160,13 @@ async function onScan(decoded){
   send(decoded);
 }
 
-/* --- kotak bidik bisa diubah ukurannya --- */
+/* --- kotak bidik resizable, selalu terpusat --- */
 const camWrap = () => document.getElementById('camWrap');
 const scanBox = () => document.getElementById('scanBox');
 const BOX_MIN = 120, BOX_DEF = 230;
 let resizing = null;
 
+// tempatkan kotak tepat di tengah area kamera
 function centerBox(){
   const w = camWrap(), b = scanBox();
   if (!w || !b) return;
@@ -175,6 +176,7 @@ function centerBox(){
   b.style.top  = Math.round((ch - b.offsetHeight) / 2) + 'px';
 }
 
+// ukuran awal menyesuaikan area, lalu dipusatkan
 function fitBox(){
   const w = camWrap(), b = scanBox();
   if (!w || !b) return;
@@ -199,15 +201,12 @@ function fitBox(){
 
   h.addEventListener('pointermove', function(e){
     if (!resizing) return;
-    const d = Math.max(e.clientX - resizing.x, e.clientY - resizing.y);
+    // gerakan menjauh dari pusat = perbesar (dihitung dari jarak, bukan arah sudut)
+    const d = Math.max(e.clientX - resizing.x, e.clientY - resizing.y) * 2;
     const max = Math.min(w.clientWidth, w.clientHeight);
-    let size = Math.max(BOX_MIN, Math.min(max, resizing.size + d));
+    const size = Math.max(BOX_MIN, Math.min(max, resizing.size + d));
     b.style.width = b.style.height = size + 'px';
-    // jaga tetap di dalam area
-    const maxL = Math.max(0, w.clientWidth  - size);
-    const maxT = Math.max(0, w.clientHeight - size);
-    b.style.left = Math.min(parseFloat(b.style.left) || 0, maxL) + 'px';
-    b.style.top  = Math.min(parseFloat(b.style.top)  || 0, maxT) + 'px';
+    centerBox();                 // tetap di tengah setiap kali ukuran berubah
     e.preventDefault(); e.stopPropagation();
   });
 
@@ -215,7 +214,7 @@ function fitBox(){
     h.addEventListener(ev, function(){ resizing = null; });
   });
 
-  window.addEventListener('resize', function(){ if (!resizing) { fitBox(); } });
+  window.addEventListener('resize', function(){ if (!resizing) fitBox(); });
 })();
 
 async function startCam(){
