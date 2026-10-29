@@ -5,6 +5,7 @@
       "maxDuration": 30
     }
   },
+  "regions": ["hnd1"],
   "routes": [
     { "src": "/(.*)", "dest": "/api/index.php" }
   ]
