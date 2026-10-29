@@ -17,7 +17,15 @@ ob_start(); ?>
 <div class="grid col-2">
   <div class="card" style="background:var(--brand);border-color:var(--brand);color:#fff">
     <div class="card-head" style="color:#fff"><h3 style="color:#fff">Pindai QR Acara</h3><span class="badge b-present" id="camStatus">Menyiapkan...</span></div>
-    <div id="reader" style="width:100%;border-radius:14px;overflow:hidden;background:#0b1220"></div>
+    <div id="camWrap" style="position:relative;width:100%;border-radius:14px;overflow:hidden;background:#0b1220;min-height:220px">
+      <div id="reader" style="width:100%"></div>
+      <div id="scanOverlay" style="position:absolute;inset:0;pointer-events:none">
+        <div id="scanBox" style="position:absolute;width:230px;height:230px;border:2px solid #fff;border-radius:12px;
+             box-shadow:0 0 0 9999px rgba(0,0,0,.5);pointer-events:auto;cursor:grab;touch-action:none">
+          <span style="position:absolute;left:0;right:0;bottom:5px;text-align:center;font-size:10.5px;color:#fff;opacity:.65;pointer-events:none">geser</span>
+        </div>
+      </div>
+    </div>
     <div id="result" style="margin-top:16px;display:none"></div>
     <div style="margin-top:14px">
       <label style="color:#fff;opacity:.85">Kode sesi (bila kamera gagal)</label>
@@ -101,6 +109,7 @@ async function stopCam(){
     v.srcObject = null; v.remove();
   });
   const r = document.getElementById('reader'); if (r) r.innerHTML = '';
+  const ov = document.getElementById('scanOverlay'); if (ov) ov.style.display = 'none';
 }
 
 async function send(code){
@@ -146,16 +155,61 @@ async function onScan(decoded){
   send(decoded);
 }
 
+/* --- kotak bidik bisa digeser --- */
+const camWrap = () => document.getElementById('camWrap');
+const scanBox = () => document.getElementById('scanBox');
+const BOX = 230;
+let dragging = null;
+
+function centerBox(){
+  const w = camWrap(), b = scanBox();
+  if (!w || !b) return;
+  const cw = w.clientWidth, ch = w.clientHeight;
+  if (!cw || !ch) return;
+  b.style.left = Math.round((cw - BOX) / 2) + 'px';
+  b.style.top  = Math.round((ch - BOX) / 2) + 'px';
+}
+
+(function initDrag(){
+  const b = scanBox();
+  if (!b) return;
+  b.addEventListener('pointerdown', function(e){
+    const r = b.getBoundingClientRect();
+    dragging = { dx: e.clientX - r.left, dy: e.clientY - r.top };
+    b.style.cursor = 'grabbing';
+    try { b.setPointerCapture(e.pointerId); } catch(_){}
+    e.preventDefault();
+  });
+  b.addEventListener('pointermove', function(e){
+    if (!dragging) return;
+    const w = camWrap(); if (!w) return;
+    const maxL = w.clientWidth  - b.offsetWidth;
+    const maxT = w.clientHeight - b.offsetHeight;
+    let l = e.clientX - dragging.dx - w.getBoundingClientRect().left;
+    let t = e.clientY - dragging.dy - w.getBoundingClientRect().top;
+    l = Math.max(0, Math.min(maxL, l));
+    t = Math.max(0, Math.min(maxT, t));
+    b.style.left = l + 'px';
+    b.style.top  = t + 'px';
+  });
+  ['pointerup','pointercancel'].forEach(function(ev){
+    b.addEventListener(ev, function(){ dragging = null; b.style.cursor = 'grab'; });
+  });
+  window.addEventListener('resize', function(){ if (!dragging) centerBox(); });
+})();
+
 async function startCam(){
   qr = new Html5Qrcode('reader', { verbose:false });
   try{
     await qr.start(
       { facingMode: 'environment' },
-      { fps: 10, qrbox: { width: 230, height: 230 } },
+      { fps: 10 },
       onScan,
       () => {}
     );
     setStatus('Kamera aktif', true);
+    centerBox();
+    setTimeout(centerBox, 400);
   }catch(e){
     const msg = String(e && e.message || e);
     if (/NotAllowed|Permission/i.test(msg)) {
