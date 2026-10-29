@@ -38,7 +38,7 @@ body{font-family:Inter,system-ui,-apple-system,sans-serif;color:#2D2D2D;backgrou
 .headline h1{font-size:36px;font-weight:800;line-height:1.18;letter-spacing:-.02em}
 
 .formside{display:flex;align-items:center;justify-content:center;background:#fff;padding:44px}
-.formbox{width:100%;max-width:440px}
+.formbox{width:100%;max-width:400px}
 .formbox h2{font-size:26px;font-weight:800;letter-spacing:-.02em}
 
 .role-box{background:#F5F5F5;border-radius:12px;padding:14px;margin:24px 0 20px}

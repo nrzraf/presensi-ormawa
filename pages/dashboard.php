@@ -48,7 +48,7 @@ if ($role === 'anggota') {
         FROM event e WHERE e.status IN ('dipublikasikan','berlangsung')
         ORDER BY e.tanggal ASC LIMIT 6", [$u['id']]);
 
-    $content = '<div class="grid col-4" style="margin-bottom:18px">'
+    $content = '<div class="grid col-4" style="margin-bottom:14px">'
         . stat_card('calendar','blue', $diikuti, 'Acara Diikuti', 'terdaftar', true)
         . stat_card('check','green', $hadir, 'Kehadiran', 'hadir', true)
         . stat_card('trend','violet', $pct . '%', 'Persentase', 'dari acara diikuti', true)
@@ -165,7 +165,7 @@ $top = q_all("SELECT m.nama, m.divisi, COUNT(a.id) AS hadir,
 
 $actions = '<a class="btn btn-primary" href="index.php?r=event_form">' . icon('plus', 17) . 'Buat Acara</a>';
 
-$content = '<div class="grid col-4" style="margin-bottom:18px">'
+$content = '<div class="grid col-4" style="margin-bottom:14px">'
     . stat_card('calendar','blue', $totalAcara, 'Total Acara', '+' . $bulanIni . ' bulan ini')
     . stat_card('clock','amber', $mendatang, 'Acara Mendatang', 'dalam 30 hari', true)
     . stat_card('users','violet', number_format($totalPeserta, 0, ',', '.'), 'Total Peserta', '+' . $mggIni . ' minggu ini')
