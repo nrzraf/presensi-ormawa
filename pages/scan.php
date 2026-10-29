@@ -21,8 +21,13 @@ ob_start(); ?>
       <div id="reader" style="width:100%"></div>
       <div id="scanOverlay" style="position:absolute;inset:0;pointer-events:none">
         <div id="scanBox" style="position:absolute;width:230px;height:230px;border:2px solid #fff;border-radius:12px;
-             box-shadow:0 0 0 9999px rgba(0,0,0,.5);pointer-events:auto;cursor:grab;touch-action:none">
-          <span style="position:absolute;left:0;right:0;bottom:5px;text-align:center;font-size:10.5px;color:#fff;opacity:.65;pointer-events:none">geser</span>
+             box-shadow:0 0 0 9999px rgba(0,0,0,.5);pointer-events:none;touch-action:none">
+          <span id="scanHandle" style="position:absolute;right:-14px;bottom:-14px;width:28px;height:28px;border-radius:50%;
+                background:#fff;border:2px solid var(--brand);box-shadow:0 2px 6px rgba(0,0,0,.35);
+                pointer-events:auto;cursor:nwse-resize;touch-action:none;display:grid;place-items:center">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#580018" stroke-width="2.6" stroke-linecap="round">
+              <path d="M21 15v6h-6M3 9V3h6M21 21l-6-6M3 3l6 6"/></svg>
+          </span>
         </div>
       </div>
     </div>
@@ -155,47 +160,62 @@ async function onScan(decoded){
   send(decoded);
 }
 
-/* --- kotak bidik bisa digeser --- */
+/* --- kotak bidik bisa diubah ukurannya --- */
 const camWrap = () => document.getElementById('camWrap');
 const scanBox = () => document.getElementById('scanBox');
-const BOX = 230;
-let dragging = null;
+const BOX_MIN = 120, BOX_DEF = 230;
+let resizing = null;
 
 function centerBox(){
   const w = camWrap(), b = scanBox();
   if (!w || !b) return;
   const cw = w.clientWidth, ch = w.clientHeight;
   if (!cw || !ch) return;
-  b.style.left = Math.round((cw - BOX) / 2) + 'px';
-  b.style.top  = Math.round((ch - BOX) / 2) + 'px';
+  b.style.left = Math.round((cw - b.offsetWidth) / 2) + 'px';
+  b.style.top  = Math.round((ch - b.offsetHeight) / 2) + 'px';
 }
 
-(function initDrag(){
-  const b = scanBox();
-  if (!b) return;
-  b.addEventListener('pointerdown', function(e){
+function fitBox(){
+  const w = camWrap(), b = scanBox();
+  if (!w || !b) return;
+  const cw = w.clientWidth, ch = w.clientHeight;
+  if (!cw || !ch) return;
+  const max = Math.max(BOX_MIN, Math.min(cw, ch));
+  const size = Math.min(BOX_DEF, max);
+  b.style.width = b.style.height = size + 'px';
+  centerBox();
+}
+
+(function initResize(){
+  const h = document.getElementById('scanHandle'), b = scanBox(), w = camWrap();
+  if (!h || !b || !w) return;
+
+  h.addEventListener('pointerdown', function(e){
     const r = b.getBoundingClientRect();
-    dragging = { dx: e.clientX - r.left, dy: e.clientY - r.top };
-    b.style.cursor = 'grabbing';
-    try { b.setPointerCapture(e.pointerId); } catch(_){}
-    e.preventDefault();
+    resizing = { x: e.clientX, y: e.clientY, size: r.width };
+    try { h.setPointerCapture(e.pointerId); } catch(_){}
+    e.preventDefault(); e.stopPropagation();
   });
-  b.addEventListener('pointermove', function(e){
-    if (!dragging) return;
-    const w = camWrap(); if (!w) return;
-    const maxL = w.clientWidth  - b.offsetWidth;
-    const maxT = w.clientHeight - b.offsetHeight;
-    let l = e.clientX - dragging.dx - w.getBoundingClientRect().left;
-    let t = e.clientY - dragging.dy - w.getBoundingClientRect().top;
-    l = Math.max(0, Math.min(maxL, l));
-    t = Math.max(0, Math.min(maxT, t));
-    b.style.left = l + 'px';
-    b.style.top  = t + 'px';
+
+  h.addEventListener('pointermove', function(e){
+    if (!resizing) return;
+    const d = Math.max(e.clientX - resizing.x, e.clientY - resizing.y);
+    const max = Math.min(w.clientWidth, w.clientHeight);
+    let size = Math.max(BOX_MIN, Math.min(max, resizing.size + d));
+    b.style.width = b.style.height = size + 'px';
+    // jaga tetap di dalam area
+    const maxL = Math.max(0, w.clientWidth  - size);
+    const maxT = Math.max(0, w.clientHeight - size);
+    b.style.left = Math.min(parseFloat(b.style.left) || 0, maxL) + 'px';
+    b.style.top  = Math.min(parseFloat(b.style.top)  || 0, maxT) + 'px';
+    e.preventDefault(); e.stopPropagation();
   });
+
   ['pointerup','pointercancel'].forEach(function(ev){
-    b.addEventListener(ev, function(){ dragging = null; b.style.cursor = 'grab'; });
+    h.addEventListener(ev, function(){ resizing = null; });
   });
-  window.addEventListener('resize', function(){ if (!dragging) centerBox(); });
+
+  window.addEventListener('resize', function(){ if (!resizing) { fitBox(); } });
 })();
 
 async function startCam(){
@@ -208,8 +228,8 @@ async function startCam(){
       () => {}
     );
     setStatus('Kamera aktif', true);
-    centerBox();
-    setTimeout(centerBox, 400);
+    fitBox();
+    setTimeout(fitBox, 400);
   }catch(e){
     const msg = String(e && e.message || e);
     if (/NotAllowed|Permission/i.test(msg)) {
