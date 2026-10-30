@@ -8,7 +8,7 @@ require_once __DIR__ . '/helpers.php';
 $r = $_GET['r'] ?? 'dashboard';
 
 // Route yang butuh login (default semua kecuali login/logout/install)
-$public = ['login', 'logout', 'install', 'cron', 'logo'];
+$public = ['login', 'register', 'logout', 'install', 'cron', 'logo'];
 if (!in_array($r, $public, true)) {
     require_login();
 }
