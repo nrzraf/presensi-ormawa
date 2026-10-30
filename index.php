@@ -14,7 +14,8 @@ if (!in_array($r, $public, true)) {
 }
 
 switch ($r) {
-    case 'login':   require __DIR__ . '/pages/login.php';   break;
+    case 'login':    require __DIR__ . '/pages/login.php';    break;
+    case 'register': require __DIR__ . '/pages/register.php'; break;
     case 'logout':  require __DIR__ . '/pages/logout.php';  break;
     case 'logo':    require __DIR__ . '/pages/logo.php';    break;
     case 'install': require __DIR__ . '/install.php';       break;
@@ -38,6 +39,8 @@ switch ($r) {
     case 'members':      require __DIR__ . '/pages/members.php';      break;
     case 'member_form':  require __DIR__ . '/pages/member_form.php';  break;
     case 'member_save':  require __DIR__ . '/pages/member_save.php';  break;
+    case 'akun':         require __DIR__ . '/pages/akun.php';         break;
+    case 'akun_hapus':   require __DIR__ . '/pages/akun_hapus.php';   break;
     case 'audit':        require __DIR__ . '/pages/audit.php';        break;
 
     case 'notifications': require __DIR__ . '/pages/notifications.php'; break;

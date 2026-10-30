@@ -320,6 +320,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--brand);box-shadow:0 0
 
         <?php if (has_role('admin')): ?>
           <div class="nav-sec">Administrasi</div>
+          <?php nav_item('index.php?r=akun', 'users', 'Buat Akun', $r, 'akun'); ?>
           <?php nav_item('index.php?r=organisasi', 'building', 'Organisasi', $r, 'organisasi'); ?>
           <?php nav_item('index.php?r=audit', 'shield', 'Audit Log', $r, 'audit'); ?>
           <?php nav_item('index.php?r=mail_log', 'file', 'Email Log', $r, 'mail_log'); ?>

@@ -20,9 +20,9 @@ ob_start(); ?>
   <div class="grid col-2e" style="gap:14px">
     <div class="field"><label>Divisi</label><input name="divisi" value="<?= e($m['divisi'] ?? '') ?>"></div>
     <div class="field"><label>Peran</label>
-      <select name="role_id">
-        <?php foreach ($roles as $r): ?><option value="<?= $r['id'] ?>" <?= ($m['role_id']??1)==$r['id']?'selected':'' ?>><?= ucfirst(e($r['nama'])) ?></option><?php endforeach; ?>
-      </select>
+      <input value="Anggota" disabled>
+      <input type="hidden" name="role_id" value="<?= (int)($m['role_id'] ?? 1) ?>">
+      <div class="sub" style="margin-top:6px">Akun panitia dan pembina dibuat lewat menu Buat Akun.</div>
     </div>
   </div>
   <div class="field"><label>Status</label>

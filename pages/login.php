@@ -137,6 +137,10 @@ body{font-family:Inter,system-ui,-apple-system,sans-serif;color:#2D2D2D;backgrou
 
         <button class="btn" type="submit">Masuk</button>
       </form>
+
+      <div style="text-align:center;font-size:13px;color:#666;margin-top:18px">
+        Belum punya akun? <a href="index.php?r=register" style="color:#580018;font-weight:700;text-decoration:none">Daftar sebagai anggota</a>
+      </div>
     </div>
   </section>
 

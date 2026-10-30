@@ -42,6 +42,7 @@ if (isset($_POST['do_install'])) {
                 email VARCHAR(150) NOT NULL UNIQUE,
                 password_hash VARCHAR(255) NOT NULL,
                 divisi VARCHAR(80),
+                no_hp VARCHAR(24),
                 status VARCHAR(10) NOT NULL DEFAULT 'aktif' CHECK (status IN ('aktif','nonaktif')),
                 role_id INT NOT NULL REFERENCES role(id),
                 created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
