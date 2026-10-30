@@ -39,14 +39,8 @@ body{font-family:Inter,system-ui,-apple-system,sans-serif;color:#2D2D2D;backgrou
 
 .formside{display:flex;align-items:center;justify-content:center;background:#fff;padding:44px}
 .formbox{width:100%;max-width:400px}
-.formbox h2{font-size:26px;font-weight:800;letter-spacing:-.02em}
+.formbox h2{font-size:26px;font-weight:800;letter-spacing:-.02em;margin-bottom:24px}
 
-.role-box{background:#F5F5F5;border-radius:12px;padding:14px;margin:24px 0 20px}
-.role-box .lab{font-size:10.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:#8a8a8a;margin-bottom:10px}
-.roles{display:flex;gap:6px;flex-wrap:wrap}
-.role{flex:1 1 auto;min-width:88px;text-align:center;font-family:inherit;font-size:13px;font-weight:700;color:#666;background:transparent;border:none;border-radius:999px;padding:10px 14px;cursor:pointer;transition:.15s;white-space:nowrap}
-.role:hover{color:#580018}
-.role.active{background:#580018;color:#fff}
 
 .field{margin-bottom:16px}
 .field label{display:block;font-size:12.5px;font-weight:700;margin-bottom:7px}
@@ -99,16 +93,6 @@ body{font-family:Inter,system-ui,-apple-system,sans-serif;color:#2D2D2D;backgrou
     <div class="formbox">
       <h2>Masuk</h2>
 
-      <div class="role-box">
-        <div class="lab">Demo - Pilih Role Pengguna</div>
-        <div class="roles" id="roles">
-          <button type="button" class="role active" data-email="panitia@student.bakrie.ac.id">Pengurus</button>
-          <button type="button" class="role" data-email="admin@ormawa.bakrie.ac.id">Admin</button>
-          <button type="button" class="role" data-email="pembina@ormawa.bakrie.ac.id">Pembina</button>
-          <button type="button" class="role" data-email="anggota@student.bakrie.ac.id">Anggota</button>
-        </div>
-      </div>
-
       <?php if ($err): ?><div class="err"><?= e($err) ?></div><?php endif; ?>
 
       <form method="post" id="f">
@@ -149,16 +133,6 @@ body{font-family:Inter,system-ui,-apple-system,sans-serif;color:#2D2D2D;backgrou
 (function(){
   var email = document.getElementById('email');
   var pass  = document.getElementById('password');
-  var roles = document.querySelectorAll('.role');
-  roles.forEach(function(b){
-    b.addEventListener('click', function(){
-      roles.forEach(function(x){ x.classList.remove('active'); });
-      b.classList.add('active');
-      email.value = b.dataset.email;
-      pass.value  = 'password123';
-      email.focus();
-    });
-  });
   var t = document.getElementById('toggle');
   t.addEventListener('click', function(){
     var show = pass.type === 'password';
